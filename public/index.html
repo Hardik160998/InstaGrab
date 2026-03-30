@@ -273,6 +273,7 @@
         }
     </style>
 </head>
+<!-- Body -->
 
 <body>
     <div class="page">
@@ -295,7 +296,6 @@
             <div id="result"></div>
         </section>
     </div>
-
     <script>
         const fetchBtn = document.getElementById("fetchBtn");
         const resultEl = document.getElementById("result");
@@ -316,11 +316,23 @@
                 const res = await fetch(`/api/insta?url=${encodeURIComponent(url)}`);
 
                 if (!res.ok) {
-                    const errText = (await res.json()).error || "Server error";
-                    throw new Error(errText);
+                    const text = await res.text();
+                    throw new Error(`Server error ${res.status}: ${text.substring(0, 180)}`);
                 }
 
-                const data = await res.json();
+                const contentType = (res.headers.get("content-type") || "").toLowerCase();
+                if (!contentType.includes("application/json")) {
+                    const text = await res.text();
+                    throw new Error(`Expected JSON response but got ${contentType || "text"}: ${text.substring(0, 180)}`);
+                }
+
+                let data;
+                try {
+                    data = await res.json();
+                } catch (parseErr) {
+                    const text = await res.text();
+                    throw new Error(`Invalid JSON from API: ${parseErr.message}. Body: ${text.substring(0, 180)}`);
+                }
 
                 const output = [];
                 if (!data.formats || !Array.isArray(data.formats) || data.formats.length === 0) {
