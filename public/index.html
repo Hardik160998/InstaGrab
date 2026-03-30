@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InstaGrab</title>
+    <style>
+        :root {
+            --primary: #ff5f6d;
+            --secondary: #ffc371;
+            --bg: #f2f7ff;
+            --card: #ffffff;
+            --text: #1c1f24;
+            --muted: #8a95ac;
+            --radius: 16px;
+            --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f7f9ff 0%, #eaf2ff 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            width: min(100%, 960px);
+            padding: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin: 0 auto;
+            border: 1px solid rgba(95, 114, 143, 0.15);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: radial-gradient(circle at 30% 30%, #ff7a43 0%, #b32d87 65%, #3b50cf 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+        }
+
+        .logo-icon::after {
+            content: "\f16d";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: white;
+            font-size: 16px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            letter-spacing: 0.02em;
+        }
+
+        p.subtitle {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .input-url {
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid rgba(94, 108, 140, 0.4);
+            border-radius: 12px;
+            padding: 0 14px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-url:focus {
+            border-color: #4f86f7;
+            box-shadow: 0 0 0 3px rgba(79, 134, 247, 0.2);
+        }
+
+        .btn {
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 13px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(255, 95, 109, 0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(255, 95, 109, 0.45);
+        }
+
+        .note {
+            text-align: center;
+            margin: 20px 0 10px;
+            color: var(--muted);
+        }
+
+        #result {
+            margin-top: 10px;
+        }
+
+        .result-card {
+            background: #f9fbff;
+            border: 1px solid rgba(91, 112, 148, 0.2);
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .result-card h3 {
+            margin: 0 0 12px;
+            font-size: 1.2rem;
+        }
+
+        .result-card .result-actions {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .result-card .result-caption {
+            width: 100%;
+            max-width: 420px;
+            text-align: left;
+            margin-top: 14px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid rgba(139, 154, 186, 0.25);
+        }
+
+        .result-card .result-caption-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #2f4c79;
+        }
+
+        .result-card .result-caption-body {
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #22304d;
+            line-height: 1.45;
+        }
+
+        .result-card img {
+            width: 100%;
+            max-width: 240px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .format-item {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid rgba(44, 63, 114, 0.15);
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .format-item a {
+            color: #0037d7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .format-item a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #d12938;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            border: 1px solid rgba(209, 41, 56, 0.35);
+            background: rgba(255, 237, 239, 0.85);
+            border-radius: 10px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .form-group {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .result-card img {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            .input-url {
+                min-height: 44px;
+            }
+
+            .logo {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <section class="card">
+            <header class="header">
+                <div class="logo">
+                    <div class="logo-icon"></div>
+                    <h1>InstaGrab</h1>
+                </div>
+                <p class="subtitle">Download Instagram Reels & Posts instantly. Just paste the link below.</p>
+            </header>
+
+            <div class="form-group">
+                <input id="url" type="text" class="input-url" placeholder="Paste Instagram URL here..." />
+                <button class="btn" id="fetchBtn">Fetch</button>
+            </div>
+
+            <p class="note">We don't store any data. All processing happens server-side.</p>
+
+            <div id="result"></div>
+        </section>
+    </div>
+
+    <script>
+        const fetchBtn = document.getElementById("fetchBtn");
+        const resultEl = document.getElementById("result");
+
+        async function getVideo() {
+            resultEl.innerHTML = "";
+            const url = document.getElementById("url").value.trim();
+
+            if (!url) {
+                resultEl.innerHTML = '<div class="error">Please enter a valid Instagram URL.</div>';
+                return;
+            }
+
+            try {
+                fetchBtn.disabled = true;
+                fetchBtn.textContent = "Fetching...";
+
+                const res = await fetch(`/api/insta?url=${encodeURIComponent(url)}`);
+
+                if (!res.ok) {
+                    const errText = (await res.json()).error || "Server error";
+                    throw new Error(errText);
+                }
+
+                const data = await res.json();
+
+                const output = [];
+                if (!data.formats || !Array.isArray(data.formats) || data.formats.length === 0) {
+                    output.push('<div class="error">No downloadable video formats were found.</div>');
+                } else {
+                    let html = '<div class="result-card">';
+                    html += `<h3>${data.title}</h3>`;
+
+                    const thumbnailUrl = data.thumbnail || (Array.isArray(data.thumbnails) && data.thumbnails.length > 0 ? data.thumbnails[data.thumbnails.length - 1].url : null);
+                    if (thumbnailUrl) {
+                        html += `<img src="/api/image?url=${encodeURIComponent(thumbnailUrl)}" alt="${data.title} thumbnail" />`;
+                    }
+
+                    const bestFormat = data.formats[0];
+                    if (bestFormat) {
+                        html += `<div class="result-actions"><button class="btn" type="button" id="downloadMainBtn">Download</button><span style="font-size:0.95rem;color:#1f3b66;">(download first format only)</span></div>`;
+                    }
+
+                    const caption = data.caption || "No caption available.";
+                    html += `<div class="result-caption"><div class="result-caption-title">Caption</div><div class="result-caption-body" id="captionText">${caption.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div><div class="result-actions"><button class="btn" type="button" id="copyCaptionBtn" style="width:100%; font-size:0.95rem; padding:10px 14px;">Copy Caption</button></div></div>`;
+
+                    html += "</div>";
+                    output.push(html);
+
+                    setTimeout(() => {
+                        const downloadBtn = document.getElementById("downloadMainBtn");
+                        if (downloadBtn && bestFormat) {
+                            downloadBtn.addEventListener("click", () => {
+                                window.open(bestFormat.url, "_blank");
+                            });
+                        }
+
+                        const copyBtn = document.getElementById("copyCaptionBtn");
+                        if (copyBtn) {
+                            copyBtn.addEventListener("click", async () => {
+                                try {
+                                    await navigator.clipboard.writeText(caption);
+                                    copyBtn.textContent = "Copied!";
+                                    setTimeout(() => {
+                                        copyBtn.textContent = "Copy Caption";
+                                    }, 1200);
+                                } catch (err) {
+                                    console.error("Copy failed", err);
+                                    copyBtn.textContent = "Copy failed";
+                                }
+                            });
+                        }
+                    }, 0);
+                }
+
+                resultEl.innerHTML = output.join("");
+            } catch (err) {
+                resultEl.innerHTML = `<div class="error">${err.message || "An unexpected error occurred."}</div>`;
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.textContent = "Fetch";
+            }
+        }
+
+        fetchBtn.addEventListener("click", getVideo);
+
+        document.getElementById("url").addEventListener("keyup", (event) => {
+            if (event.key === "Enter") {
+                getVideo();
+            }
+        });
+    </script>
+</body>
+
+</html>
